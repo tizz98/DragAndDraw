@@ -4,19 +4,22 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PointF;
+import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class BoxDrawingView extends View {
     private static final String TAG = "BoxDrawingView";
+    private static final String BOXES_KEY = "boxes";
+    private static final String SAVED_STATE_KEY = "saved_state";
 
     private Box mCurrentBox;
-    private List<Box> mBoxen = new ArrayList<>();
+    private ArrayList<Box> mBoxen = new ArrayList<>();
     private Paint mBoxPaint;
     private Paint mBackgroundPaint;
 
@@ -82,5 +85,23 @@ public class BoxDrawingView extends View {
 
         Log.i(TAG, action + " at x=" + current.x + ", y=" + current.y);
         return true;
+    }
+
+    @Override
+    protected Parcelable onSaveInstanceState() {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(SAVED_STATE_KEY, super.onSaveInstanceState());
+        bundle.putParcelableArrayList(BOXES_KEY, mBoxen);
+
+        return bundle;
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Parcelable state) {
+        Bundle bundle = (Bundle) state;
+        Parcelable savedState = bundle.getParcelable(SAVED_STATE_KEY);
+
+        mBoxen = bundle.getParcelableArrayList(BOXES_KEY);
+        super.onRestoreInstanceState(savedState);
     }
 }
